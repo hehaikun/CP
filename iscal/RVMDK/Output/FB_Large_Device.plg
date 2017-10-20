@@ -1,0 +1,767 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Project:</h2>
+C:\work\粪便分析仪\ucosii+usb\mcu\RVMDK\Project.uvproj
+Project File Date:  11/05/2015
+
+<h2>Output:</h2>
+Build target 'Project'
+assembling startup_stm32f10x_ld.s...
+compiling system_stm32f10x.c...
+compiling core_cm3.c...
+compiling misc.c...
+compiling stm32f10x_adc.c...
+compiling stm32f10x_bkp.c...
+compiling stm32f10x_can.c...
+compiling stm32f10x_cec.c...
+compiling stm32f10x_crc.c...
+compiling stm32f10x_dac.c...
+compiling stm32f10x_dbgmcu.c...
+compiling stm32f10x_dma.c...
+compiling stm32f10x_exti.c...
+compiling stm32f10x_flash.c...
+compiling stm32f10x_fsmc.c...
+compiling stm32f10x_gpio.c...
+compiling stm32f10x_i2c.c...
+compiling stm32f10x_iwdg.c...
+compiling stm32f10x_pwr.c...
+compiling stm32f10x_rcc.c...
+compiling stm32f10x_rtc.c...
+compiling stm32f10x_sdio.c...
+compiling stm32f10x_spi.c...
+compiling stm32f10x_tim.c...
+compiling stm32f10x_usart.c...
+compiling stm32f10x_wwdg.c...
+compiling usb_core.c...
+compiling usb_init.c...
+compiling usb_int.c...
+compiling usb_mem.c...
+compiling usb_regs.c...
+compiling usb_sil.c...
+compiling hw_config.c...
+compiling usb_desc.c...
+compiling usb_endp.c...
+compiling usb_istr.c...
+compiling usb_prop.c...
+compiling usb_pwr.c...
+compiling usbio.c...
+compiling main.c...
+compiling stm32f10x_it.c...
+compiling usart.c...
+..\User\usart.c(84): warning:  #177-D: variable "cpu_sr" was declared but never referenced
+..\User\usart.c:     OS_CPU_SR cpu_sr=0;
+..\User\usart.c:               ^
+..\User\usart.c(285): warning:  #223-D: function "delay_us" declared implicitly
+..\User\usart.c:        delay_us(10);
+..\User\usart.c:        ^
+..\User\usart.c(364): warning:  #177-D: variable "cnt" was declared but never referenced
+..\User\usart.c:        u8 cnt = 100;   
+..\User\usart.c:           ^
+..\User\usart.c: ..\User\usart.c: 3 warnings, 0 errors
+compiling switch_ops.c...
+compiling driverMotor.c...
+compiling os_cpu_c.c...
+compiling os_dbg.c...
+compiling os_core.c...
+compiling os_flag.c...
+compiling os_mbox.c...
+compiling os_mem.c...
+compiling os_mutex.c...
+compiling os_q.c...
+compiling os_sem.c...
+compiling os_task.c...
+compiling os_time.c...
+compiling os_tmr.c...
+compiling delay.c...
+compiling sys.c...
+linking...
+Program Size: Code=16560 RO-data=640 RW-data=404 ZI-data=6892  
+FromELF: creating hex file...
+".\Output\FB_Large_Device.axf" - 0 Error(s), 3 Warning(s).
+Build target 'Project'
+compiling system_stm32f10x.c...
+compiling core_cm3.c...
+compiling misc.c...
+compiling stm32f10x_adc.c...
+compiling stm32f10x_bkp.c...
+compiling stm32f10x_can.c...
+compiling stm32f10x_cec.c...
+compiling stm32f10x_crc.c...
+compiling stm32f10x_dac.c...
+compiling stm32f10x_dbgmcu.c...
+compiling stm32f10x_dma.c...
+compiling stm32f10x_exti.c...
+compiling stm32f10x_flash.c...
+compiling stm32f10x_fsmc.c...
+compiling stm32f10x_gpio.c...
+compiling stm32f10x_i2c.c...
+compiling stm32f10x_iwdg.c...
+compiling stm32f10x_pwr.c...
+compiling stm32f10x_rcc.c...
+compiling stm32f10x_rtc.c...
+compiling stm32f10x_sdio.c...
+compiling stm32f10x_spi.c...
+compiling stm32f10x_tim.c...
+compiling stm32f10x_usart.c...
+compiling stm32f10x_wwdg.c...
+compiling usb_core.c...
+compiling usb_init.c...
+compiling usb_int.c...
+compiling usb_mem.c...
+compiling usb_regs.c...
+compiling usb_sil.c...
+compiling hw_config.c...
+compiling usb_desc.c...
+compiling usb_endp.c...
+compiling usb_istr.c...
+compiling usb_prop.c...
+compiling usb_pwr.c...
+compiling usbio.c...
+compiling main.c...
+compiling stm32f10x_it.c...
+compiling usart.c...
+..\User\usart.c(84): warning:  #177-D: variable "cpu_sr" was declared but never referenced
+..\User\usart.c:     OS_CPU_SR cpu_sr=0;
+..\User\usart.c:               ^
+..\User\usart.c(285): warning:  #223-D: function "delay_us" declared implicitly
+..\User\usart.c:        delay_us(10);
+..\User\usart.c:        ^
+..\User\usart.c(306): error:  #20: identifier "USART3_IRQn" is undefined
+..\User\usart.c:       NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+..\User\usart.c:                                            ^
+..\User\usart.c(364): warning:  #177-D: variable "cnt" was declared but never referenced
+..\User\usart.c:        u8 cnt = 100;   
+..\User\usart.c:           ^
+..\User\usart.c: ..\User\usart.c: 3 warnings, 1 error
+compiling switch_ops.c...
+compiling driverMotor.c...
+compiling os_cpu_c.c...
+compiling os_dbg.c...
+compiling os_core.c...
+compiling os_flag.c...
+compiling os_mbox.c...
+compiling os_mem.c...
+compiling os_mutex.c...
+compiling os_q.c...
+compiling os_sem.c...
+compiling os_task.c...
+compiling os_time.c...
+compiling os_tmr.c...
+compiling delay.c...
+compiling sys.c...
+Target not created
+Build target 'Project'
+compiling main.c...
+compiling usart.c...
+..\User\usart.c(84): warning:  #177-D: variable "cpu_sr" was declared but never referenced
+..\User\usart.c:     OS_CPU_SR cpu_sr=0;
+..\User\usart.c:               ^
+..\User\usart.c(285): warning:  #223-D: function "delay_us" declared implicitly
+..\User\usart.c:        delay_us(10);
+..\User\usart.c:        ^
+..\User\usart.c(306): error:  #20: identifier "USART3_IRQn" is undefined
+..\User\usart.c:       NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+..\User\usart.c:                                            ^
+..\User\usart.c(364): warning:  #177-D: variable "cnt" was declared but never referenced
+..\User\usart.c:        u8 cnt = 100;   
+..\User\usart.c:           ^
+..\User\usart.c: ..\User\usart.c: 3 warnings, 1 error
+Target not created
+Build target 'Project'
+compiling usart.c...
+..\User\usart.c(84): warning:  #177-D: variable "cpu_sr" was declared but never referenced
+..\User\usart.c:     OS_CPU_SR cpu_sr=0;
+..\User\usart.c:               ^
+..\User\usart.c(285): warning:  #223-D: function "delay_us" declared implicitly
+..\User\usart.c:        delay_us(10);
+..\User\usart.c:        ^
+..\User\usart.c(325): warning:  #223-D: function "ctl_uart3_irq" declared implicitly
+..\User\usart.c:      ctl_uart3_irq(ENABLE,bound);
+..\User\usart.c:      ^
+..\User\usart.c(334): warning:  #177-D: variable "cnt" was declared but never referenced
+..\User\usart.c:        u8 cnt = 100;   
+..\User\usart.c:           ^
+..\User\usart.c: ..\User\usart.c: 4 warnings, 0 errors
+linking...
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol ctl_uart3_irq (referred from usart.o).
+.\Output\USB_Device.axf: Not enough information to list image symbols.
+.\Output\USB_Device.axf: Finished: 1 information, 0 warning and 1 error messages.
+Target not created
+Build target 'Project'
+compiling usart.c...
+..\User\usart.c(84): warning:  #177-D: variable "cpu_sr" was declared but never referenced
+..\User\usart.c:     OS_CPU_SR cpu_sr=0;
+..\User\usart.c:               ^
+..\User\usart.c(285): warning:  #223-D: function "delay_us" declared implicitly
+..\User\usart.c:        delay_us(10);
+..\User\usart.c:        ^
+..\User\usart.c: ..\User\usart.c: 2 warnings, 0 errors
+linking...
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol uart3_init (referred from usart.o).
+.\Output\USB_Device.axf: Not enough information to list image symbols.
+.\Output\USB_Device.axf: Finished: 1 information, 0 warning and 1 error messages.
+Target not created
+Build target 'Project'
+compiling usart.c...
+..\User\usart.c(84): warning:  #177-D: variable "cpu_sr" was declared but never referenced
+..\User\usart.c:     OS_CPU_SR cpu_sr=0;
+..\User\usart.c:               ^
+..\User\usart.c: ..\User\usart.c: 1 warning, 0 errors
+linking...
+Program Size: Code=15660 RO-data=640 RW-data=404 ZI-data=6380  
+FromELF: creating hex file...
+".\Output\USB_Device.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Project'
+compiling main.c...
+..\User\main.c(154): error:  #20: identifier "STATUS_1_LED" is undefined
+..\User\main.c:     STATUS_1_LED = LED_OFF;
+..\User\main.c:     ^
+..\User\main.c(155): error:  #20: identifier "STATUS_2_LED" is undefined
+..\User\main.c:     STATUS_2_LED = LED_OFF;
+..\User\main.c:     ^
+..\User\main.c(294): error:  #20: identifier "STATUS_1_LED" is undefined
+..\User\main.c:                                 STATUS_1_LED = LED_OFF;
+..\User\main.c:                                 ^
+..\User\main.c(295): error:  #20: identifier "STATUS_2_LED" is undefined
+..\User\main.c:                         STATUS_2_LED = LED_OFF;
+..\User\main.c:                         ^
+..\User\main.c: ..\User\main.c: 0 warnings, 4 errors
+compiling switch_ops.c...
+..\User\switch_ops.c(15): error:  #20: identifier "SWITCH_1" is undefined
+..\User\switch_ops.c:             case 1 : GPIO_ResetBits(SWITCH_1); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(15): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 1 : GPIO_ResetBits(SWITCH_1); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(16): error:  #20: identifier "SWITCH_2" is undefined
+..\User\switch_ops.c:             case 2 : GPIO_ResetBits(SWITCH_2); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(16): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 2 : GPIO_ResetBits(SWITCH_2); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(17): error:  #20: identifier "SWITCH_3" is undefined
+..\User\switch_ops.c:             case 3 : GPIO_ResetBits(SWITCH_3); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(17): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 3 : GPIO_ResetBits(SWITCH_3); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(18): error:  #20: identifier "SWITCH_4" is undefined
+..\User\switch_ops.c:             case 4 : GPIO_ResetBits(SWITCH_4); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(18): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 4 : GPIO_ResetBits(SWITCH_4); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(19): error:  #20: identifier "SWITCH_5" is undefined
+..\User\switch_ops.c:             case 5 : GPIO_ResetBits(SWITCH_5); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(19): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 5 : GPIO_ResetBits(SWITCH_5); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(20): error:  #20: identifier "SWITCH_6" is undefined
+..\User\switch_ops.c:             case 6 : GPIO_ResetBits(SWITCH_6); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(20): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 6 : GPIO_ResetBits(SWITCH_6); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(21): error:  #20: identifier "SWITCH_7" is undefined
+..\User\switch_ops.c:             case 7 : GPIO_ResetBits(SWITCH_7); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(21): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 7 : GPIO_ResetBits(SWITCH_7); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(22): error:  #20: identifier "SWITCH_8" is undefined
+..\User\switch_ops.c:             case 8 : GPIO_ResetBits(SWITCH_8); break; 
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(22): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 8 : GPIO_ResetBits(SWITCH_8); break; 
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(23): error:  #20: identifier "SWITCH_9" is undefined
+..\User\switch_ops.c:             case 9 : GPIO_ResetBits(SWITCH_9); break; 
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(23): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 9 : GPIO_ResetBits(SWITCH_9); break; 
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(24): error:  #20: identifier "SWITCH_10" is undefined
+..\User\switch_ops.c:             case 10 : GPIO_ResetBits(SWITCH_10); break; 
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(24): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 10 : GPIO_ResetBits(SWITCH_10); break; 
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(25): error:  #20: identifier "SWITCH_11" is undefined
+..\User\switch_ops.c:             case 11 : GPIO_ResetBits(SWITCH_11); break; 
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(25): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 11 : GPIO_ResetBits(SWITCH_11); break; 
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(26): error:  #20: identifier "SWITCH_12" is undefined
+..\User\switch_ops.c:             case 12 : GPIO_ResetBits(SWITCH_12); break; 
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(26): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 12 : GPIO_ResetBits(SWITCH_12); break; 
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(27): error:  #20: identifier "SWITCH_13" is undefined
+..\User\switch_ops.c:             case 13 : GPIO_ResetBits(SWITCH_13); break;
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(27): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 13 : GPIO_ResetBits(SWITCH_13); break;
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(28): error:  #20: identifier "SWITCH_14" is undefined
+..\User\switch_ops.c:             case 14 : GPIO_ResetBits(SWITCH_14); break;
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(28): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 14 : GPIO_ResetBits(SWITCH_14); break;
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(29): error:  #20: identifier "SWITCH_15" is undefined
+..\User\switch_ops.c:             case 15 : GPIO_ResetBits(SWITCH_15); break;
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(29): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 15 : GPIO_ResetBits(SWITCH_15); break;
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c: ..\User\switch_ops.c: 0 warnings, 30 errors
+compiling driverMotor.c...
+..\User\driverMotor.c(164): error:  #20: identifier "JBB_GO" is undefined
+..\User\driverMotor.c:              if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                        ^
+..\User\driverMotor.c(164): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(165): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                                  ^
+..\User\driverMotor.c(166): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                                  ^
+..\User\driverMotor.c(175): error:  #20: identifier "JBB_GO" is undefined
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(JBB_GO)) {   //判断是否进入到光耦区域
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(175): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(JBB_GO)) {   //判断是否进入到光耦区域
+..\User\driverMotor.c:                                                    ^
+..\User\driverMotor.c(176): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                                    ^
+..\User\driverMotor.c(177): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                                    ^
+..\User\driverMotor.c(185): error:  #20: identifier "MCU_CLK2" is undefined
+..\User\driverMotor.c:            if (GPIO_ReadInputDataBit(MCU_CLK2))   //给脉冲信号
+..\User\driverMotor.c:                                      ^
+..\User\driverMotor.c(185): error:  #165: too few arguments in function call
+..\User\driverMotor.c:            if (GPIO_ReadInputDataBit(MCU_CLK2))   //给脉冲信号
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(186): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              GPIO_ResetBits(MCU_CLK2);           
+..\User\driverMotor.c:                                     ^
+..\User\driverMotor.c(188): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              GPIO_SetBits(MCU_CLK2);               
+..\User\driverMotor.c:                                   ^
+..\User\driverMotor.c(195): error:  #20: identifier "YBP_LONG_GO" is undefined
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_LONG_GO) == 0) {
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(195): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_LONG_GO) == 0) {
+..\User\driverMotor.c:                                                         ^
+..\User\driverMotor.c(196): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_LONG_GO) == 0) {
+..\User\driverMotor.c:                                                         ^
+..\User\driverMotor.c(197): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_LONG_GO) == 0) {
+..\User\driverMotor.c:                                                         ^
+..\User\driverMotor.c(209): error:  #20: identifier "YBP_SHORT_GO" is undefined
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(209): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                          ^
+..\User\driverMotor.c(210): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                          ^
+..\User\driverMotor.c(211): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                          ^
+..\User\driverMotor.c(234): error:  #20: identifier "YBP_SHORT_GO" is undefined
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                            ^
+..\User\driverMotor.c(234): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                        ^
+..\User\driverMotor.c(235): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                        ^
+..\User\driverMotor.c(236): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {   
+..\User\driverMotor.c:                                                        ^
+..\User\driverMotor.c(248): error:  #20: identifier "MCU_CLK1" is undefined
+..\User\driverMotor.c:            if (GPIO_ReadInputDataBit(MCU_CLK1))   //给脉冲信号
+..\User\driverMotor.c:                                      ^
+..\User\driverMotor.c(248): error:  #165: too few arguments in function call
+..\User\driverMotor.c:            if (GPIO_ReadInputDataBit(MCU_CLK1))   //给脉冲信号
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(249): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              GPIO_ResetBits(MCU_CLK1);           
+..\User\driverMotor.c:                                     ^
+..\User\driverMotor.c(251): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              GPIO_SetBits(MCU_CLK1);               
+..\User\driverMotor.c:                                   ^
+..\User\driverMotor.c(290): error:  #20: identifier "MCU_ENABLE2" is undefined
+..\User\driverMotor.c:       case 0 : GPIO_ResetBits(MCU_ENABLE2); break;
+..\User\driverMotor.c:                               ^
+..\User\driverMotor.c(290): error:  #165: too few arguments in function call
+..\User\driverMotor.c:       case 0 : GPIO_ResetBits(MCU_ENABLE2); break;
+..\User\driverMotor.c:                                          ^
+..\User\driverMotor.c: ..\User\driverMotor.c: 0 warnings, 30 errors
+Target not created
+Build target 'Project'
+compiling main.c...
+..\User\main.c(302): error:  #20: identifier "STATUS_1_LED" is undefined
+..\User\main.c:                                 STATUS_1_LED = LED_OFF;
+..\User\main.c:                                 ^
+..\User\main.c(303): error:  #20: identifier "STATUS_2_LED" is undefined
+..\User\main.c:                         STATUS_2_LED = LED_OFF;
+..\User\main.c:                         ^
+..\User\main.c: ..\User\main.c: 0 warnings, 2 errors
+compiling switch_ops.c...
+..\User\switch_ops.c(15): error:  #20: identifier "SWITCH_1" is undefined
+..\User\switch_ops.c:             case 1 : GPIO_ResetBits(SWITCH_1); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(15): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 1 : GPIO_ResetBits(SWITCH_1); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(16): error:  #20: identifier "SWITCH_2" is undefined
+..\User\switch_ops.c:             case 2 : GPIO_ResetBits(SWITCH_2); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(16): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 2 : GPIO_ResetBits(SWITCH_2); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(17): error:  #20: identifier "SWITCH_3" is undefined
+..\User\switch_ops.c:             case 3 : GPIO_ResetBits(SWITCH_3); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(17): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 3 : GPIO_ResetBits(SWITCH_3); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(18): error:  #20: identifier "SWITCH_4" is undefined
+..\User\switch_ops.c:             case 4 : GPIO_ResetBits(SWITCH_4); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(18): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 4 : GPIO_ResetBits(SWITCH_4); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(19): error:  #20: identifier "SWITCH_5" is undefined
+..\User\switch_ops.c:             case 5 : GPIO_ResetBits(SWITCH_5); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(19): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 5 : GPIO_ResetBits(SWITCH_5); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(20): error:  #20: identifier "SWITCH_6" is undefined
+..\User\switch_ops.c:             case 6 : GPIO_ResetBits(SWITCH_6); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(20): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 6 : GPIO_ResetBits(SWITCH_6); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(21): error:  #20: identifier "SWITCH_7" is undefined
+..\User\switch_ops.c:             case 7 : GPIO_ResetBits(SWITCH_7); break;
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(21): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 7 : GPIO_ResetBits(SWITCH_7); break;
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(22): error:  #20: identifier "SWITCH_8" is undefined
+..\User\switch_ops.c:             case 8 : GPIO_ResetBits(SWITCH_8); break; 
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(22): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 8 : GPIO_ResetBits(SWITCH_8); break; 
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(23): error:  #20: identifier "SWITCH_9" is undefined
+..\User\switch_ops.c:             case 9 : GPIO_ResetBits(SWITCH_9); break; 
+..\User\switch_ops.c:                                     ^
+..\User\switch_ops.c(23): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 9 : GPIO_ResetBits(SWITCH_9); break; 
+..\User\switch_ops.c:                                             ^
+..\User\switch_ops.c(24): error:  #20: identifier "SWITCH_10" is undefined
+..\User\switch_ops.c:             case 10 : GPIO_ResetBits(SWITCH_10); break; 
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(24): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 10 : GPIO_ResetBits(SWITCH_10); break; 
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(25): error:  #20: identifier "SWITCH_11" is undefined
+..\User\switch_ops.c:             case 11 : GPIO_ResetBits(SWITCH_11); break; 
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(25): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 11 : GPIO_ResetBits(SWITCH_11); break; 
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(26): error:  #20: identifier "SWITCH_12" is undefined
+..\User\switch_ops.c:             case 12 : GPIO_ResetBits(SWITCH_12); break; 
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(26): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 12 : GPIO_ResetBits(SWITCH_12); break; 
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(27): error:  #20: identifier "SWITCH_13" is undefined
+..\User\switch_ops.c:             case 13 : GPIO_ResetBits(SWITCH_13); break;
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(27): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 13 : GPIO_ResetBits(SWITCH_13); break;
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(28): error:  #20: identifier "SWITCH_14" is undefined
+..\User\switch_ops.c:             case 14 : GPIO_ResetBits(SWITCH_14); break;
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(28): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 14 : GPIO_ResetBits(SWITCH_14); break;
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c(29): error:  #20: identifier "SWITCH_15" is undefined
+..\User\switch_ops.c:             case 15 : GPIO_ResetBits(SWITCH_15); break;
+..\User\switch_ops.c:                                      ^
+..\User\switch_ops.c(29): error:  #165: too few arguments in function call
+..\User\switch_ops.c:             case 15 : GPIO_ResetBits(SWITCH_15); break;
+..\User\switch_ops.c:                                               ^
+..\User\switch_ops.c: ..\User\switch_ops.c: 0 warnings, 30 errors
+compiling driverMotor.c...
+..\User\driverMotor.c(164): error:  #20: identifier "JBB_GO" is undefined
+..\User\driverMotor.c:              if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                        ^
+..\User\driverMotor.c(164): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(165): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                                  ^
+..\User\driverMotor.c(166): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                                  ^
+..\User\driverMotor.c(175): error:  #20: identifier "JBB_GO" is undefined
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(JBB_GO)) {   //判断是否进入到光耦区域
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(175): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(JBB_GO)) {   //判断是否进入到光耦区域
+..\User\driverMotor.c:                                                    ^
+..\User\driverMotor.c(176): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                                    ^
+..\User\driverMotor.c(177): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(JBB_GO)) {
+..\User\driverMotor.c:                                                    ^
+..\User\driverMotor.c(185): error:  #20: identifier "MCU_CLK2" is undefined
+..\User\driverMotor.c:            if (GPIO_ReadInputDataBit(MCU_CLK2))   //给脉冲信号
+..\User\driverMotor.c:                                      ^
+..\User\driverMotor.c(185): error:  #165: too few arguments in function call
+..\User\driverMotor.c:            if (GPIO_ReadInputDataBit(MCU_CLK2))   //给脉冲信号
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(186): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              GPIO_ResetBits(MCU_CLK2);           
+..\User\driverMotor.c:                                     ^
+..\User\driverMotor.c(188): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              GPIO_SetBits(MCU_CLK2);               
+..\User\driverMotor.c:                                   ^
+..\User\driverMotor.c(195): error:  #20: identifier "YBP_LONG_GO" is undefined
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_LONG_GO) == 0) {
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(195): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_LONG_GO) == 0) {
+..\User\driverMotor.c:                                                         ^
+..\User\driverMotor.c(196): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_LONG_GO) == 0) {
+..\User\driverMotor.c:                                                         ^
+..\User\driverMotor.c(197): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_LONG_GO) == 0) {
+..\User\driverMotor.c:                                                         ^
+..\User\driverMotor.c(209): error:  #20: identifier "YBP_SHORT_GO" is undefined
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(209): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                          ^
+..\User\driverMotor.c(210): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                          ^
+..\User\driverMotor.c(211): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                    if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                          ^
+..\User\driverMotor.c(234): error:  #20: identifier "YBP_SHORT_GO" is undefined
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                            ^
+..\User\driverMotor.c(234): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                        ^
+..\User\driverMotor.c(235): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {
+..\User\driverMotor.c:                                                        ^
+..\User\driverMotor.c(236): error:  #165: too few arguments in function call
+..\User\driverMotor.c:                  if (GPIO_ReadInputDataBit(YBP_SHORT_GO) == 0) {   
+..\User\driverMotor.c:                                                        ^
+..\User\driverMotor.c(248): error:  #20: identifier "MCU_CLK1" is undefined
+..\User\driverMotor.c:            if (GPIO_ReadInputDataBit(MCU_CLK1))   //给脉冲信号
+..\User\driverMotor.c:                                      ^
+..\User\driverMotor.c(248): error:  #165: too few arguments in function call
+..\User\driverMotor.c:            if (GPIO_ReadInputDataBit(MCU_CLK1))   //给脉冲信号
+..\User\driverMotor.c:                                              ^
+..\User\driverMotor.c(249): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              GPIO_ResetBits(MCU_CLK1);           
+..\User\driverMotor.c:                                     ^
+..\User\driverMotor.c(251): error:  #165: too few arguments in function call
+..\User\driverMotor.c:              GPIO_SetBits(MCU_CLK1);               
+..\User\driverMotor.c:                                   ^
+..\User\driverMotor.c(290): error:  #20: identifier "MCU_ENABLE2" is undefined
+..\User\driverMotor.c:       case 0 : GPIO_ResetBits(MCU_ENABLE2); break;
+..\User\driverMotor.c:                               ^
+..\User\driverMotor.c(290): error:  #165: too few arguments in function call
+..\User\driverMotor.c:       case 0 : GPIO_ResetBits(MCU_ENABLE2); break;
+..\User\driverMotor.c:                                          ^
+..\User\driverMotor.c: ..\User\driverMotor.c: 0 warnings, 30 errors
+Target not created
+Build target 'Project'
+compiling main.c...
+..\User\main.c(302): error:  #20: identifier "STATUS_1_LED" is undefined
+..\User\main.c:                                 STATUS_1_LED = LED_OFF;
+..\User\main.c:                                 ^
+..\User\main.c(303): error:  #20: identifier "STATUS_2_LED" is undefined
+..\User\main.c:                         STATUS_2_LED = LED_OFF;
+..\User\main.c:                         ^
+..\User\main.c: ..\User\main.c: 0 warnings, 2 errors
+Target not created
+Build target 'Project'
+compiling main.c...
+linking...
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol check_go (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol close_switch (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol driver_motor (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_go_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_input_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_motor_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol open_switch (referred from main.o).
+.\Output\USB_Device.axf: Not enough information to list image symbols.
+.\Output\USB_Device.axf: Finished: 1 information, 0 warning and 7 error messages.
+Target not created
+Build target 'Project'
+compiling main.c...
+linking...
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol close_switch (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol driver_motor (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_go_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_input_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_motor_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol open_switch (referred from main.o).
+.\Output\USB_Device.axf: Not enough information to list image symbols.
+.\Output\USB_Device.axf: Finished: 1 information, 0 warning and 6 error messages.
+Target not created
+Build target 'Project'
+compiling main.c...
+..\User\main.c(243): error:  #147: declaration is incompatible with "int close_switch(unsigned char)" (declared at line 6 of "..\User\switch_ops.h")
+..\User\main.c:   void close_switch(unsigned char index)
+..\User\main.c:        ^
+..\User\main.c: ..\User\main.c: 0 warnings, 1 error
+Target not created
+Build target 'Project'
+compiling main.c...
+..\User\main.c(282): warning:  #223-D: function "open_switch" declared implicitly
+..\User\main.c:                         open_switch(package.params[0]);                                            
+..\User\main.c:                         ^
+..\User\main.c(294): warning:  #223-D: function "get_input_status" declared implicitly
+..\User\main.c:                                 package.params[1] = get_input_status(package.params[0]);
+..\User\main.c:                                                     ^
+..\User\main.c(300): warning:  #223-D: function "get_go_status" declared implicitly
+..\User\main.c:                                 package.params[1] = get_go_status(package.params[0]);    //获取 光耦 状态
+..\User\main.c:                                                     ^
+..\User\main.c(340): warning:  #223-D: function "driver_motor" declared implicitly
+..\User\main.c:                            driver_motor(package.param_length,package.params);   
+..\User\main.c:                            ^
+..\User\main.c(346): warning:  #223-D: function "get_motor_status" declared implicitly
+..\User\main.c:                            get_motor_status(&package.params[1]);  //获取电机状态        
+..\User\main.c:                            ^
+..\User\main.c: ..\User\main.c: 5 warnings, 0 errors
+linking...
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol driver_motor (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_go_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_input_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_motor_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol open_switch (referred from main.o).
+.\Output\USB_Device.axf: Not enough information to list image symbols.
+.\Output\USB_Device.axf: Finished: 1 information, 0 warning and 5 error messages.
+Target not created
+Build target 'Project'
+compiling main.c...
+..\User\main.c(282): warning:  #223-D: function "open_switch" declared implicitly
+..\User\main.c:                         open_switch(package.params[0]);                                            
+..\User\main.c:                         ^
+..\User\main.c(294): warning:  #223-D: function "get_input_status" declared implicitly
+..\User\main.c:                                 package.params[1] = get_input_status(package.params[0]);
+..\User\main.c:                                                     ^
+..\User\main.c(300): warning:  #223-D: function "get_go_status" declared implicitly
+..\User\main.c:                                 package.params[1] = get_go_status(package.params[0]);    //获取 光耦 状态
+..\User\main.c:                                                     ^
+..\User\main.c: ..\User\main.c: 3 warnings, 0 errors
+linking...
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_go_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_input_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol open_switch (referred from main.o).
+.\Output\USB_Device.axf: Not enough information to list image symbols.
+.\Output\USB_Device.axf: Finished: 1 information, 0 warning and 3 error messages.
+Target not created
+Build target 'Project'
+compiling main.c...
+..\User\main.c(299): warning:  #223-D: function "get_input_status" declared implicitly
+..\User\main.c:                                 package.params[1] = get_input_status(package.params[0]);
+..\User\main.c:                                                     ^
+..\User\main.c(305): warning:  #223-D: function "get_go_status" declared implicitly
+..\User\main.c:                                 package.params[1] = get_go_status(package.params[0]);    //获取 光耦 状态
+..\User\main.c:                                                     ^
+..\User\main.c: ..\User\main.c: 2 warnings, 0 errors
+linking...
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_go_status (referred from main.o).
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_input_status (referred from main.o).
+.\Output\USB_Device.axf: Not enough information to list image symbols.
+.\Output\USB_Device.axf: Finished: 1 information, 0 warning and 2 error messages.
+Target not created
+Build target 'Project'
+compiling main.c...
+..\User\main.c(299): warning:  #223-D: function "get_input_status" declared implicitly
+..\User\main.c:                                 package.params[1] = get_input_status(package.params[0]);
+..\User\main.c:                                                     ^
+..\User\main.c: ..\User\main.c: 1 warning, 0 errors
+linking...
+.\Output\USB_Device.axf: Error: L6218E: Undefined symbol get_input_status (referred from main.o).
+.\Output\USB_Device.axf: Not enough information to list image symbols.
+.\Output\USB_Device.axf: Finished: 1 information, 0 warning and 1 error messages.
+Target not created
+Build target 'Project'
+compiling main.c...
+..\User\main.c(256): warning:  #940-D: missing return statement at end of non-void function "get_input_status"
+..\User\main.c:   }
+..\User\main.c:   ^
+..\User\main.c: ..\User\main.c: 1 warning, 0 errors
+linking...
+Program Size: Code=12016 RO-data=640 RW-data=400 ZI-data=6328  
+FromELF: creating hex file...
+".\Output\USB_Device.axf" - 0 Error(s), 1 Warning(s).
+Build target 'Project'
+compiling main.c...
+linking...
+Program Size: Code=12016 RO-data=640 RW-data=400 ZI-data=6328  
+FromELF: creating hex file...
+".\Output\USB_Device.axf" - 0 Error(s), 0 Warning(s).
+Build target 'Project'
+compiling main.c...
+linking...
+Program Size: Code=11944 RO-data=640 RW-data=400 ZI-data=6328  
+FromELF: creating hex file...
+".\Output\USB_Device.axf" - 0 Error(s), 0 Warning(s).
+Build target 'Project'
+linking...
+Program Size: Code=11944 RO-data=640 RW-data=400 ZI-data=6328  
+FromELF: creating hex file...
+".\Output\USB_Device.axf" - 0 Error(s), 0 Warning(s).
+Build target 'Project'
+compiling usb_desc.c...
+linking...
+Program Size: Code=11944 RO-data=640 RW-data=400 ZI-data=6328  
+FromELF: creating hex file...
+".\Output\USB_Device.axf" - 0 Error(s), 0 Warning(s).
+Build target 'Project'
+compiling usb_desc.c...
+linking...
+Program Size: Code=11944 RO-data=640 RW-data=400 ZI-data=6328  
+FromELF: creating hex file...
+".\Output\USB_Device.axf" - 0 Error(s), 0 Warning(s).
+Build target 'Project'
+linking...
+Program Size: Code=11944 RO-data=640 RW-data=400 ZI-data=6328  
+FromELF: creating hex file...
+".\Output\USB_Device.axf" - 0 Error(s), 0 Warning(s).

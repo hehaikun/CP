@@ -1,0 +1,1830 @@
+/**
+  ******************************************************************************
+  * @file    main.c
+  * $Author: wdluo $
+  * $Revision: 67 $
+  * $Date:: 2012-08-15 19:00:29 +0800 #$
+  * @brief   主函数.
+  ******************************************************************************
+  * @attention
+  *
+  *<h3><center>&copy; Copyright 2009-2012, EmbedNet</center>
+  *<center><a href="http://www.embed-net.com">http://www.embed-net.com</a></center>
+  *<center>All Rights Reserved</center></h3>
+  *
+  ******************************************************************************
+  */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "usart.h"
+#include "usb_lib.h"
+#include "hw_config.h"
+#include "usbio.h"
+#include "includes.h"
+#include "delay.h"
+#include "sys.h"
+#include "pinDefine.h"
+#include "adc.h"
+#include "LCD.h"
+#include "flash.h"
+#include "spi.h"
+//#include "MM_T035.h"
+//#include "switch_ops.h"
+//#include "driverMotor.h"
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
+extern volatile uint32_t EP1_ReceivedCount;
+extern volatile uint32_t EP2_ReceivedCount;
+extern const unsigned char gImage_MM_T035[];
+/* Private function prototypes -----------------------------------------------*/
+/* Private functions ---------------------------------------------------------*/
+
+/**
+  * @brief  串口打印输出
+  * @param  None
+  * @retval None
+  */
+
+#define USB_PACKAGE_PARAM_LENGTH 58
+//usb?????
+typedef struct tag_USBPackage {
+    unsigned char serial_no;        //???
+    unsigned char cmd;              //??
+    unsigned char cmd_type;         //????
+    unsigned char cmd_subtype;      //?????
+    unsigned char param_length;     //????,???params???,?TUSBPackage                //
+    unsigned char params[USB_PACKAGE_PARAM_LENGTH]; 	   //??
+    unsigned char crc;              //crc???
+} USB_PACKAGE;
+
+//USB 命令定义
+#define USB_CMD_LOOP_TEST   		0x1
+#define USB_CMD_OPEN_SWITCH 		0x2
+#define USB_CMD_CLOSE_SWITCH 		0x3
+#define USB_CMD_GET_INPUT_STATUS 	0x4
+#define USB_CMD_START_DEBUG		 	0x5
+#define USB_CMD_STOP_DEBUG          0x6
+#define USB_CMD_DEV_INFO            0x7
+#define USB_CMD_LOAD_PARAMS         0x8
+#define USB_CMD_SAVE_PARAMS         0x9
+#define USB_CMD_GET_GO_STATUS       0xa     //获取光耦状态
+#define USB_CMD_GET_ALL_GO_STATUS   0xb     //获取全部光耦状态
+#define USB_CMD_STOP_CHECK_GO_STATUS 0xc    //停止检测光耦状态
+#define USB_CMD_START_CECHK_GO_STATUS 0xd   //开始检测光耦状态
+#define USB_CMD_DRIVER_MOTOR		  0xe   //驱动电机
+#define USB_CMD_GET_MOTOR_STATUS      0xf   //获取电机运行状态
+
+//A/D转换引脚定义
+
+#define PD_CLK PCout(0)	// PA8	 	//#define PD_CLK PCout(0)	// PA8	 
+#define DOUT PCin(1)	// PD2
+
+
+//要写入到W25Q64的字符串数组
+const u8 TEXT_Buffer[]= {"0014574"};
+#define SIZE sizeof(TEXT_Buffer)
+
+//  ******************************************************************************
+//  * @file    main.c
+//  * $Author: Du Mingxing $
+// * $Revision: 67 $
+//  * $Date:: 2016-06-14 10:56#$
+// * @brief:电子称称量程序变量定义
+//  ******************************************************************************
+#define MAXWEIGHT    0X000000FF;
+#define ACCURACY      0X00000005;
+#define GB_MAXZERO	 0X384;
+volatile u32 calculate_weight;//计算重量
+volatile u32 display_weight;//显示重量
+volatile u32 Zerotracking_data;	 //零点数值
+volatile u32 tare_data;			   //去皮数据(皮重)
+volatile unsigned char AD_DATA[3];//重量数值
+volatile u8 pice_data[3];//单价数值
+volatile u8 totalpice_data[3];//总价数据
+volatile u8 table_data[40];//存放10组数据
+volatile u8 point_table;//存放数组
+volatile u8	send_data[64];//存放发送数据
+volatile int weight[10]=0;
+volatile int plu[10]=0;
+volatile int price[10]=0;
+
+
+//  ******************************************************************************
+//  * @file    main.c
+//  * $Author: Du Mingxing $
+// * $Revision: 67 $
+//  * $Date:: 2016-05-23 10:00 #$
+// * @brief:key1按键结构体定义
+//  ******************************************************************************
+struct io_port {
+    GPIO_TypeDef *GPIO_x;
+    unsigned short GPIO_pin;
+};
+
+static struct io_port key1_output[5] = {
+    {GPIOB, GPIO_Pin_11},
+    {GPIOB, GPIO_Pin_10},
+    {GPIOA, GPIO_Pin_7},
+    {GPIOA, GPIO_Pin_6},
+    {GPIOA, GPIO_Pin_5}
+};
+
+static struct io_port key1_input[5] =
+{
+    {GPIOA, GPIO_Pin_4},
+    {GPIOA, GPIO_Pin_3},
+    {GPIOA, GPIO_Pin_2},
+    {GPIOA, GPIO_Pin_0},
+    {GPIOA, GPIO_Pin_1}
+};
+unsigned char key1[5][5];
+//**********************************************************************************************************************
+//  ******************************************************************************
+//  * @file    main.c
+//  * $Author: Du Mingxing $
+// * $Revision: 67 $
+//  * $Date:: 2016-05-23 10:00 #$
+// * @brief:key2按键结构体定义
+//  ******************************************************************************
+static struct io_port key2_output[7] = {
+	     {GPIOB, GPIO_Pin_3},
+     {GPIOB, GPIO_Pin_9},
+    {GPIOB, GPIO_Pin_4},	
+    {GPIOB, GPIO_Pin_8},
+    {GPIOB, GPIO_Pin_5},
+    {GPIOB, GPIO_Pin_7},
+    {GPIOB, GPIO_Pin_6}
+};
+
+static struct io_port key2_input[5] =
+{
+
+    {GPIOC, GPIO_Pin_8},
+    {GPIOB, GPIO_Pin_0},
+    {GPIOA, GPIO_Pin_15},
+    {GPIOB, GPIO_Pin_1},
+    {GPIOA, GPIO_Pin_8},
+
+
+};
+unsigned char key2[7][5];
+//**********************************************************************************************************************
+char debug_msg[128];   				   //调试用
+unsigned char g_dev_major =0 ,g_dev_minor = 1;  //设备版本
+unsigned char debug_mode = 0;
+unsigned char start_check_go =0;  //检测光耦标志
+unsigned char g_go_type = 0;      //光耦类型
+
+
+//邮箱和消息队列
+OS_EVENT  *RS232LogQ,*USBMBox,*MessageQ,*ADsem,*ADQ,*key1Box,*key2Box,*BEEPsem;
+void *RS232LogMsg[32];	   //串口1输出消息队列
+void *USBMsg[32];          //usb 消息
+void *USBSentMsg[32];   //发生消息
+void *ADSentMsg[9];   //AD转换消息
+int UartLengthCount;
+int MessageType;
+uint8_t RxBuffer1[64];
+uint8_t PressN=0xff;
+int RxCounter1;
+int ReCheck=0;
+
+
+
+/////////////////////////UCOSII任务堆栈设置///////////////////////////////////
+//START 任务
+//设置任务优先级
+#define START_TASK_PRIO      						10 //开始任务的优先级设置为最低
+//设置任务堆栈大小
+#define START_STK_SIZE  							128
+//创建任务堆栈空间
+OS_STK START_TASK_STK[START_STK_SIZE];
+//任务函数接口
+void start_task(void *pdata);
+
+
+//MAIN_TASK 任务
+//设置任务优先级
+#define MAIN_TASK_PRIO		       				9
+//设置任务堆栈大小
+#define MAIN_TASK_STK_SIZE  			    		128
+//创建任务堆栈空间
+OS_STK MAIN_TASK_STK[MAIN_TASK_STK_SIZE];
+//任务函数接口
+void main_task(void *pdata);
+
+//心跳 LED 任务
+//设置任务优先级
+#define HEARTBEAT_LED_TASK_PRIO       				8
+//设置任务堆栈大小
+#define HEARTBEAT_LED_STK_SIZE  		    		128
+//创建任务堆栈空间
+OS_STK HEARTBEAT_LED_TASK_STK[HEARTBEAT_LED_STK_SIZE];
+//任务函数接口
+void heartbeat_led_task(void *pdata);
+
+//rs232 1 log 任务
+//设置任务优先级
+#define RS232_LOG_TASK_PRIO		       				7
+//设置任务堆栈大小
+#define RS232_LOG_STK_SIZE  			    		128
+//创建任务堆栈空间
+OS_STK RS232_LOG_TASK_STK[RS232_LOG_STK_SIZE];
+//任务函数接口
+void RS232_LOG_task(void *pdata);
+
+
+//KEY1_SCAN_TASK 任务
+//设置任务优先级
+#define KEY1_SCAN_TASK_PRIO		       				6
+//设置任务堆栈大小
+#define KEY1_SCAN_TASK_STK_SIZE  			    		128
+//创建任务堆栈空间
+OS_STK KEY1_SCAN_TASK_STK[KEY1_SCAN_TASK_STK_SIZE];
+//任务函数接口
+void Key1_scan_task(void *pdata);
+
+//KEY1_SCAN_TASK 任务
+//设置任务优先级
+#define KEY2_SCAN_TASK_PRIO		       				5
+//设置任务堆栈大小
+#define KEY2_SCAN_TASK_STK_SIZE  			    		128
+//创建任务堆栈空间
+OS_STK KEY2_SCAN_TASK_STK[KEY2_SCAN_TASK_STK_SIZE];
+//任务函数接口
+void Key2_scan_task(void *pdata);
+
+
+//BEEP_TASK 任务
+//设置任务优先级
+#define BEEP_TASK_TASK_PRIO		       				4
+//设置任务堆栈大小
+#define BEEP_TASK_TASK_STK_SIZE  			    		128
+//创建任务堆栈空间
+OS_STK BEEP_TASK_TASK_STK[BEEP_TASK_TASK_STK_SIZE];
+//任务函数接口
+void Beep_task(void *pdata);
+
+//A/D_TASK 任务
+//设置任务优先级
+#define AD_TASK_PRIO		       				3
+//设置任务堆栈大小
+#define AD_TASK_STK_SIZE  			    		128
+//创建任务堆栈空间
+OS_STK AD_TASK_STK[AD_TASK_STK_SIZE];
+//任务函数接口
+void AD_TASK(void *pdata);
+
+
+
+//KEY1_SCAN_TASK 任务
+//设置任务优先级
+#define LCD_TASK_PRIO		       		       2
+//设置任务堆栈大小
+#define LCD_TASK_STK_SIZE  			    		256
+//创建任务堆栈空间
+OS_STK LCD_TASK_STK[LCD_TASK_STK_SIZE];
+//任务函数接口
+void lcd_task(void *pdata);
+
+
+
+
+//USB事件 任务
+//设置任务优先级
+#define USB_TASK_PRIO       						1
+//设置任务堆栈大小
+#define USB_STK_SIZE  		    					128
+//创建任务堆栈空间
+OS_STK USB_TASK_STK[USB_STK_SIZE];
+
+//rs232 1 log 任务
+//设置任务优先级
+#define LED_TASK_PRIO		       				0
+//设置任务堆栈大小
+#define LED_STK_SIZE  			    		128
+//创建任务堆栈空间
+OS_STK LED_TASK_STK[LED_STK_SIZE];
+//任务函数接口
+void LED_task(void *pdata);
+
+//初始化PC13和PE5为输出口.并使能这两个口的时钟
+//LED IO初始化	 【心跳指示灯】
+void IO_Init(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStructure;
+
+    //心跳 灯
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);	 //使能PB,PE端口时钟
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;				 //LED0-->PC.4 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 //推挽输出
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 //IO口速度为50MHz
+    GPIO_Init(GPIOB, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC.4
+    HEARTBEAT_LED = LED_OFF;						 //PC.4 输出高
+
+    //继电器1,2,3
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);	    //使能PA端口时钟
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14 | GPIO_Pin_15;    //LED2-->PA.0, LED3-->PA.1 端口配置
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 	//推挽输出
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 	//IO口速度为50MHz
+    GPIO_Init(GPIOB, &GPIO_InitStructure);					//根据设定参数初始化GPIOA0 和 1
+
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1; //PA.1
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;	//复用推挽输出
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    PAout(1) = 1;
+
+    JDQ_1 = JDQ_OFF;
+    JDQ_2 = JDQ_OFF;
+
+}
+void Beep_Init(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2; //PA.8
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;	//复用推挽输出
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+}
+void AD_Init(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;	//复用推挽输出
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;	//浮空输入
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+}
+
+void Key1_scan_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    unsigned char i;
+
+    /* 键盘扫描输出线 输出低电平 */  /* PB9 PB8 PB7 PB6 PB5 PG15 输出*/
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5  | GPIO_Pin_6| GPIO_Pin_7 ;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11| GPIO_Pin_10;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    /* 键盘扫描输入线 键被按时输入低电平 放开输入高电平 */  /* PG14 PG13 PG11 PG9 PD7 PD6 输入*/
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0| GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3| GPIO_Pin_4;
+
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+    for(i = 0; i < 5; i++)
+    {
+        GPIO_ResetBits(key1_output[i].GPIO_x, key1_output[i].GPIO_pin);
+    }
+
+}
+
+void Key2_scan_init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    unsigned char i;
+
+    /* 键盘扫描输出线 输出低电平 */  /* PB9 PB8 PB7 PB6 PB5 PG15 输出*/
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6| GPIO_Pin_7| GPIO_Pin_8| GPIO_Pin_9|GPIO_Pin_3 ;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    /* 键盘扫描输入线 键被按时输入低电平 放开输入高电平 */  /* PG14 PG13 PG11 PG9 PD7 PD6 输入*/
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 ;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8 ;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_15|GPIO_Pin_8 ;
+
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    for(i = 0; i < 7; i++)
+    {
+        GPIO_ResetBits(key2_output[i].GPIO_x, key2_output[i].GPIO_pin);
+    }
+
+}
+
+void PC0_IO_Init(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;	//复用推挽输出
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+}
+void PC1_IO_Init(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;	//复用推挽输出
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+}
+/*
+ * 函数名：LCD_GPIO_Config
+ * 描述  ：根据FSMC配置LCD的I/O
+ * 输入  ：无
+ * 输出  ：无
+ * 调用  ：内部调用
+ */
+void LCD_GPIO_Config(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    /* Enable the FSMC Clock */
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
+
+    /* config lcd gpio clock base on FSMC */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE , ENABLE);
+
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+
+    /* config tft rst gpio */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    /* config tft back_light gpio base on the PT4101 */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 ;
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    /* config tft data lines base on FSMC
+     * data lines,FSMC-D0~D15: PD 14 15 0 1,PE 7 8 9 10 11 12 13 14 15,PD 8 9 10
+     */
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_8 | GPIO_Pin_9 |
+                                  GPIO_Pin_10 | GPIO_Pin_14 | GPIO_Pin_15;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 |
+                                  GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 |
+                                  GPIO_Pin_15;
+    GPIO_Init(GPIOE, &GPIO_InitStructure);
+
+    /* config tft control lines base on FSMC
+     * PD4-FSMC_NOE  :LCD-RD
+    * PD5-FSMC_NWE  :LCD-WR
+     * PD7-FSMC_NE1  :LCD-CS
+    * PD11-FSMC_A16 :LCD-DC
+     */
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 ;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+    /* tft control gpio init */
+
+    GPIO_SetBits(GPIOD, GPIO_Pin_13);		 // RST = 1
+    GPIO_SetBits(GPIOD, GPIO_Pin_4);		 // RD = 1
+    GPIO_SetBits(GPIOD, GPIO_Pin_5);		 // WR = 1
+    GPIO_SetBits(GPIOD, GPIO_Pin_7);		 //	CS = 1
+
+}
+
+
+
+void  lcd_init(void)
+{
+
+    LCD_GPIO_Config();
+    // DispLogo();		/* 显示例程Logo */
+
+
+}
+
+
+
+
+int main(void)
+{
+    uint8_t clock;
+    RCC_ClocksTypeDef RCC_Clocks;
+    UartLengthCount=0;
+    //RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
+    //GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable,ENABLE);
+    delay_init();	    	 		  //延时初始化
+    NVIC_Configuration(); 	 		  //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
+
+    //初始化 usb
+    USB_Interrupts_Config();
+    Set_USBClock();
+    USB_Init();
+
+    IO_Init();		  			      //初始化 与LED连接的硬件接口
+    Beep_Init();
+    AD_Init();
+    Key1_scan_init();
+    Key2_scan_init();
+    HEARTBEAT_LED = LED_ON;
+    SPI_Flash_Init();  		//SPI FLASH 初始化
+    lcd_init();
+    uart1_init(9600);	 			  //串口1初始化为115200 调试用
+//	sprintf(debug_msg,"Large FB System Running,ver:%d.%d...\r\n\0",g_dev_major,g_dev_minor);
+//	uart1_send_(debug_msg,0);
+//
+//	sprintf(debug_msg,"system clock info :\r\n\0");
+//	uart1_send_(debug_msg,strlen(debug_msg));
+//
+    clock = RCC_GetSYSCLKSource();
+//	if (clock == 0x0) {
+//	  sprintf(debug_msg,"HSI  \0");
+//	}
+//	if (clock == 0x4)
+//	  sprintf(debug_msg,"HSE  \0");
+//	if (clock == 0x8)
+//	  sprintf(debug_msg,"PLL  \0");
+//    uart1_send_(debug_msg,strlen(debug_msg));
+    RCC_GetClocksFreq(&RCC_Clocks);
+//	sprintf(debug_msg,"SYSCLK_Frequency=%d \r\n\0",RCC_Clocks.SYSCLK_Frequency);
+//	uart1_send_(debug_msg,strlen(debug_msg));
+
+    OSInit();
+
+    //创建邮箱
+    /*
+    CommMBox = OSMboxCreate((void*)0);
+    if (CommMBox == NULL) {
+      uart1_send("OSMboxCreate Error \r\n\0",0);
+    } else {
+      uart1_send("OSMboxCreate OK \r\n\0",0);
+    }
+    */
+    //创建消息队列
+    RS232LogQ = OSQCreate(&RS232LogMsg[0],32);
+//	if (RS232LogQ == NULL) {
+//	  uart1_send_("OSQCreate RS232LogQ Error \r\n\0",0);
+//	} else {
+//	  uart1_send_("OSQCreate RS232LogQ OK \r\n\0",0);
+//	}
+
+    MessageQ = OSQCreate(&USBSentMsg[0],32);
+//	if (MessageQ == NULL) {
+//	  uart1_send_("OSQCreate RS232LogQ Error \r\n\0",0);
+//	} else {
+//	  uart1_send_("OSQCreate RS232LogQ OK \r\n\0",0);
+//	}
+
+
+    USBMBox = OSMboxCreate((void*)0); //创建邮箱 2016-05-16--dzl
+    ADQ=OSQCreate(&ADSentMsg[0],9);//创建信号量	2016-06-13--dzl
+    ADsem = OSSemCreate(0); //创建邮箱 2016-05-16--dzl
+    BEEPsem=OSSemCreate(0);
+    key1Box = OSMboxCreate((void*)0); //创建邮箱 2016-06-13--dzl
+    key2Box = OSMboxCreate((void*)0); //创建邮箱 2016-06-13--dzl
+//	if (USBMBox == NULL) {
+//	  uart1_send_("OSMBoxCreate USBMBox Error \r\n\0",0);
+//	} else {
+//	  uart1_send_("OSMBoxCreate USBMBox OK \r\n\0",0);
+//	}
+
+    OSTaskCreate(start_task,(void *)0,(OS_STK *)&START_TASK_STK[START_STK_SIZE-1],START_TASK_PRIO );//创建起始任务
+    OSStart();
+
+}
+
+unsigned char calc_crc(USB_PACKAGE *usbPackage)
+{
+    unsigned char len;
+    usbPackage->crc = usbPackage->serial_no + usbPackage->cmd + usbPackage->cmd_type + usbPackage->cmd_subtype
+                      + usbPackage->param_length;
+    for (len = 0; len <= 57; len++)
+        usbPackage->crc += usbPackage->params[len];
+    return usbPackage->crc;
+}
+
+u8 key1_exchange( u8 anjian)
+{
+    switch(anjian)
+    {
+
+    case 0x0b:
+        return 0x00;
+        break;
+    case 0x0c:
+        return 0x01;
+        break;
+    case 0x07:
+        return 0x02;
+        break;
+    case 0x02:
+        return 0x03;
+        break;
+    case 0x0d:
+        return 0x04;
+        break;
+    case 0x08:
+        return 0x05;
+        break;
+    case 0x03:
+        return 0x06;
+        break;
+    case 0x0e:
+        return 0x07;
+        break;
+    case 0x09:
+        return 0x08;
+        break;
+    case 0x04:
+        return 0x09;
+        break;
+    case 0x18:
+        return 0x0a;
+        break;
+    case 0x13:
+        return 0x0b;
+        break;
+    case 0x06:
+        return 0x0c;
+        break;
+    default :
+        return 0xff;
+        break;
+    }
+
+}
+
+
+
+void close_switch(unsigned char index)
+{
+    if (index == 1) {
+        JDQ_1 = JDQ_OFF;
+    }
+    if (index == 2) {
+        JDQ_2 = JDQ_OFF;
+    }
+}
+
+void open_switch(unsigned char index)
+{
+    if (index == 1) {
+        JDQ_1 = JDQ_ON;
+    }
+    if (index == 2) {
+        JDQ_2 = JDQ_ON;
+    }
+}
+
+unsigned char get_input_status(unsigned char index)
+{
+    unsigned char ret = 0;
+    return ret;
+}
+
+
+void usb_int_function()
+{
+    unsigned char   mBuf[64];
+//	return;
+    USB_GetData(ENDP1,mBuf,EP1_ReceivedCount);
+
+
+    if (EP1_ReceivedCount == 64) {
+        USB_SendData(ENDP1,mBuf,EP1_ReceivedCount);
+    }
+    /*
+        //处理数据
+        if (EP1_ReceivedCount == 8) {
+            if (mBuf[0] == 0x81) {
+                if (mBuf[1] ==  0x1) {  //开灯
+                    HEARTBEAT_LED = LED_ON;
+                    uart1_send_("ZM RS232 OK! \r\n\0",0);
+                }
+                if (mBuf[1] == 0x2) {  //开继电器
+                    JDQ_1 = JDQ_ON;
+                    uart1_send_("ZM relay open \r\n\0",0);
+                    USB_SendData(ENDP1,"__LOVE_Y",EP1_ReceivedCount);
+                }
+                if (mBuf[1] == 0x3) {  //关灯
+                    HEARTBEAT_LED = LED_OFF;
+
+                }
+                if (mBuf[1] == 0x4) {  //关继电器
+                    JDQ_1 = JDQ_OFF;
+                    USB_SendData(ENDP1,mBuf,EP1_ReceivedCount);
+                }
+            }
+            //将数据原封不动的发回给安卓
+            USB_SendData(ENDP1,mBuf,EP1_ReceivedCount);
+
+        }
+    	*/
+}
+
+void Key1_scan_task(void *pdata)
+{
+    unsigned char i, j,key_num;
+    unsigned char k[1];
+    unsigned int inputprice[6];
+    unsigned char bz_dio=0;//小数点按下标志
+    unsigned char bz_m=0;
+    unsigned char  key_num_u=0xff;//上一个键值
+    u32 temp;
+    inputprice[0]=0;
+    inputprice[1]=0;
+    inputprice[2]=0;
+    inputprice[3]=0;
+    inputprice[4]=0;
+    inputprice[5]=0;
+    while(1)
+    {
+        for(i = 0; i < 5; i++)
+        {
+            GPIO_SetBits(key1_output[i].GPIO_x, key1_output[i].GPIO_pin);
+        }
+        for(i = 0; i < 5; i++)
+        {
+            GPIO_ResetBits(key1_output[i].GPIO_x, key1_output[i].GPIO_pin);
+            delay_ms(5);
+            for(j = 0; j < 5; j++)
+            {
+                if(GPIO_ReadInputDataBit(key1_input[j].GPIO_x, key1_input[j].GPIO_pin) == 0)
+                {
+                    key1[i][j] = 1;
+                }
+                else
+                {
+                    key1[i][j] = 0;
+                }
+            }
+            GPIO_SetBits(key1_output[i].GPIO_x, key1_output[i].GPIO_pin);
+        }
+
+        /*
+                delay_ms(10);
+                for(i = 0; i < 5; i++)
+                {
+                    GPIO_SetBits(key1_output[i].GPIO_x, key1_output[i].GPIO_pin);
+                }
+                for(i = 0; i < 5; i++)
+                {
+                    GPIO_ResetBits(key1_output[i].GPIO_x, key1_output[i].GPIO_pin);
+                    delay_ms(5);
+                    for(j = 0; j < 5; j++)
+                    {
+                        if(GPIO_ReadInputDataBit(key1_input[j].GPIO_x, key1_input[j].GPIO_pin) == 0)
+                        {
+                            if(key1[i][j])
+                                key1[i][j] = 1;
+                            else
+                                key1[i][j] = 0;
+                        }
+                        else
+                        {
+                            key1[i][j] = 0;
+                        }
+                    }
+                    GPIO_SetBits(key1_output[i].GPIO_x, key1_output[i].GPIO_pin);
+                }
+
+                for(i = 0; i < 5; i++)
+                {
+                    GPIO_ResetBits(key1_output[i].GPIO_x, key1_output[i].GPIO_pin);
+                }
+
+        */
+        key_num=0;
+        for(i = 0; i < 5; i++)
+        {
+            for(j = 0; j < 5; j++)
+            {
+                if(key1[i][j]) //
+                    key_num=key_num+1;
+            }
+        }
+        if(key_num==0x01)
+        {
+            k[0]=0;
+            for(i = 0; i < 5; i++)
+            {
+                for(j = 0; j < 5; j++)
+                {
+                    if(key1[i][j]) //扫描按键值 2016-06-13--dmx
+                    {
+                        if(key_num_u==k[0])//不重复按键时，打印按键值	2016-06-13--dmx
+                            key_num_u=k[0];
+                        else
+                        {
+                            OSMboxPost(key1Box,(void*)k);//将扫描按键值通过邮箱给主函数 2016-06-13--dmx
+                            key_num_u=k[0];
+                            uart1_send_(k,1);
+                            k[0]=key1_exchange(k[0]);
+                            if((k[0]>=0)&&(k[0]<0x0d))//判断plu按键是否按下
+                            {
+                                if(k[0]==0x0a)//清除
+                                {
+                                    inputprice[0]=0;
+                                    inputprice[1]=0;
+                                    inputprice[2]=0;
+                                    inputprice[3]=0;
+                                    inputprice[4]=0;
+                                    inputprice[5]=0;
+                                    bz_dio=0;
+                                    bz_m=0;
+                                }
+
+                                if(k[0]==0x0c) //小数点按下
+                                {
+                                    if(bz_dio)
+                                        bz_dio=0;
+                                    else
+                                        bz_dio=1;
+                                }
+                                if((k[0]>=0)&&(k[0]<=0x09))
+                                {
+                                    if(bz_dio)
+                                    {
+                                        if(bz_m==0)
+                                            inputprice[4]= k[0];
+                                        if(bz_m==1)
+                                            inputprice[5]=k[0];
+                                        bz_m++;
+                                    }
+                                    else
+                                    {
+                                        inputprice[0]=inputprice[1];
+                                        inputprice[1]=inputprice[2];
+                                        inputprice[2]=inputprice[3];
+                                        inputprice[3]=k[0];
+                                    }
+                                }
+
+
+                                //  inputprice[0]=0;
+                                // inputprice[1]=0;
+                                // inputprice[2]=0;
+                                //  inputprice[3]=0;
+                                //  inputprice[4]=2;
+                                //	  inputprice[5]=0;
+                                // temp=(u32)inputprice[4];
+                                // temp=temp*10;
+                                temp=0;
+                                temp=(u32)inputprice[0]*100000+temp;
+                                temp=(u32)inputprice[1]*10000+temp;
+                                temp=(u32)inputprice[2]*1000+temp;
+                                temp=(u32)inputprice[3]*100+temp;
+                                temp=(u32)inputprice[4]*10+temp;
+                                temp=(u32)inputprice[5]+temp;
+                                //temp=0x114;
+                                pice_data[2]=temp;
+                                pice_data[1]=temp>>8;
+                                pice_data[0]=temp>>16;
+                            }
+
+                            k[0]=k[0]+' '+16;
+                            LCD_ShowChar(210,200,k[0],24,0);
+                            OSSemPost(BEEPsem);
+                            delay_ms(200);
+                        }
+                    }
+                    k[0]=k[0]+1;
+                    key1[i][j]=0;
+                }
+            }
+        }
+        else
+            key_num_u=0xff;
+        delay_ms(10);
+    }
+}
+
+void Key2_scan_task(void *pdata)
+{
+    unsigned char i, j,key_num;
+    unsigned char k[1];
+    unsigned char key_num_u1=0xff;//上一个键值
+    //PBout(4)=1;
+    //PBout(7)=1;
+    while(1)
+    {
+        for(i = 0; i <7; i++)
+        {
+            GPIO_SetBits(key2_output[i].GPIO_x, key2_output[i].GPIO_pin);
+        }
+
+        for(i = 0; i < 7; i++)
+        {
+            GPIO_ResetBits(key2_output[i].GPIO_x, key2_output[i].GPIO_pin);
+            delay_ms(5);
+            for(j = 0; j < 5; j++)
+            {
+                if(GPIO_ReadInputDataBit(key2_input[j].GPIO_x, key2_input[j].GPIO_pin) == 0)
+                {
+                    key2[i][j] = 1;
+                }
+                else
+                {
+                    key2[i][j] = 0;
+                }
+            }
+            GPIO_SetBits(key2_output[i].GPIO_x, key2_output[i].GPIO_pin);
+        }
+
+        /*
+            delay_ms(10);
+
+            for(i = 0; i < 7; i++)
+            {
+                GPIO_SetBits(key2_output[i].GPIO_x, key2_output[i].GPIO_pin);
+            }
+
+            for(i = 0; i < 7; i++)
+            {
+                GPIO_ResetBits(key2_output[i].GPIO_x, key2_output[i].GPIO_pin);
+                delay_ms(5);
+                for(j = 0; j < 5; j++)
+                {
+                    if(GPIO_ReadInputDataBit(key2_input[j].GPIO_x, key2_input[j].GPIO_pin) == 0)
+                    {
+                        if(key2[i][j])
+                            key2[i][j] = 1;
+                        else
+                            key2[i][j] = 0;
+                    }
+                    else
+                    {
+                        key2[i][j] = 0;
+                    }
+                }
+                GPIO_SetBits(key2_output[i].GPIO_x, key2_output[i].GPIO_pin);
+            }
+
+           */
+        key_num=0;
+        for(i = 0; i < 7; i++) //扫描按键按下个数
+        {
+            for(j = 0; j < 5; j++)
+            {
+                if(key2[i][j]) //
+                {   key_num=key_num+1;
+
+                  //  k[0]=key_num+' '+16;
+                   // LCD_ShowChar(165,280,k[0],24,0);
+                }
+            }
+        }
+        if(key_num==0x01)
+        {
+            k[0]=1;
+            for(i = 0; i < 7; i++) //打印按键
+            {
+                for(j = 0; j < 5; j++)
+                {
+                    if(key2[i][j]) //扫描按键值 2016-06-13--dmx
+                    {
+                        if(key_num_u1==k[0])//不重复按键时，打印按键值	2016-06-13--dmx
+                            key_num_u1=k[0];
+                        else
+                        {
+                            key_num_u1=k[0];
+                            OSMboxPost(key2Box,(void*)key_num_u1);//将扫描按键值通过邮箱给主函数 2016-06-13--dmx
+
+                            // uart1_send_(k,1);
+                            //k[0]=k[0]+' '+16;
+                            // LCD_ShowChar(165,280,k[0],24,0);
+                            OSSemPost(BEEPsem);
+                            delay_ms(200);
+                        }
+
+                    }
+                    k[0]=k[0]+1;
+                    key2[i][j]=0;
+                }
+            }
+        }
+        else
+            key_num_u1=0xff;
+        delay_ms(10);
+    }
+}
+/*
+void touch_task(void *pdata)
+	   {
+	   char i;
+	   while(1)
+{
+	   		Adc_Init();
+		PC1_IO_Init();
+		PCout(1)=1;
+
+		delay_ms(50);
+		i[0]=Get_Adc_Average(ADC_Channel_10,10);//PC0 =Y+
+		PCout(1)=0;
+		delay_ms(50);
+		Adc_Init();
+		PC0_IO_Init();
+		PCout(0)=1;
+
+		delay_ms(50);
+		i[1]=Get_Adc_Average(ADC_Channel_11,10);//PC1=X+
+		PCout(0)=0;
+		//i[0]=(u8)(i[0]/256)*142;
+		//i[1]=(u8)(i[1]/256)*106;
+
+		uart1_send_(i,2);
+	    delay_ms(100);
+	    PAout(8)=1;
+		delay_ms(100);
+		}
+			}
+			*/
+void Beep_task(void *pdata)
+{
+    u8 err;
+    while(1)
+    {
+        OSSemPend(BEEPsem,0,&err);
+        PCout(2)=1;
+        delay_ms(100);
+        PCout(2)=0;
+    }
+}
+void LED_task(void *pdata)
+{
+
+
+    while(1)
+    {
+
+        OSSemPost(ADsem);
+        delay_ms(200);
+    }
+
+}
+void AD_task(void *pdata)
+{
+    u8 err;
+    u8 i;
+    unsigned char AD_data[3];
+    while(1)
+    {
+        OSSemPend(ADsem,0,&err);
+        AD_data[0]=0;
+        AD_data[1]=0;
+        AD_data[2]=0;
+        PD_CLK=0;
+        while(DOUT);
+        for(i=0; i<8; i++)
+        {
+            PD_CLK=1;	//时钟线置高
+            delay_us(4);//延时2us;
+            PD_CLK=0;	//时钟线置高
+            AD_data[0]|=DOUT;//数据口p0.0温度数据
+            delay_us(4);//延时2us;
+            if(i<7)
+                AD_data[0]=AD_data[0]<<1;
+        }
+        for(i=0; i<8; i++)
+        {
+            PD_CLK=1;	//时钟线置高
+            delay_us(4);//延时2us;
+            PD_CLK=0;	//时钟线置高
+            AD_data[1]|=DOUT;//数据口p0.0温度数据
+            delay_us(4);//延时2us;
+            if(i<7)
+                AD_data[1]=AD_data[1]<<1;
+        }
+        for(i=0; i<8; i++) //剩余脉冲数
+        {
+            PD_CLK=1;	//时钟线置高
+            delay_us(4);//延时2us;
+            PD_CLK=0;	//时钟线置高
+            AD_data[2]|=DOUT;//数据口p0.0温度数据
+            delay_us(4);//延时2us;
+            if(i<7)
+                AD_data[2]=AD_data[2]<<1;
+
+        }
+        PD_CLK=1;	//时钟线置高
+        delay_us(4);//延时2us;
+        PD_CLK=0;	//时钟线置低
+        delay_us(4);//延时2us;
+        // AD_data[0]=0x00;
+        // AD_data[1]=0xff;
+        // AD_data[2]=0xff;
+        if((AD_DATA[0]&0x80)==0)
+        {   AD_DATA[0]=AD_data[0]|0x80;
+            AD_DATA[1]=AD_data[1];
+            AD_DATA[2]=AD_data[2];
+        }
+
+        //	for(i=0;i<3;i++)
+        //  {
+        //    OSQPost(ADQ,&AD_DATA[i]);
+        //	 }
+        //uart1_send_(AD_data,3);
+
+
+
+        delay_ms(10);
+    }
+}
+
+
+void lcd_task(void *pdata)
+{
+    char i=0;
+    char m=0;
+    u8 *ad_data[9];
+    u8 err;
+    int wiight_display[8];
+    int pice_display[8];
+    int total_display[8];
+    u32	n;
+//   Lcd_Initialize();
+//   Lcd_ColorBox(0,0,320,480,Black);
+//   delay_ms(5);
+//   LCD_Fill_Pic(74,164,172,152,gImage_MM_T035);
+//   LCD_ShowString(164,260,200,40,24,"now is going!"); //显示开机状态提示
+    delay_ms(5000);
+    Lcd_ColorBox(0,0,320,480,Black);
+    while(1)
+    {
+        if(0)
+        {
+            LCD_DrawLine(0, 0, 479, 0);
+            LCD_DrawLine(479, 0, 479, 319);
+            LCD_DrawLine(0, 0,0 ,319 );
+            LCD_DrawLine(0, 319, 479, 319);
+        }
+        if(i>9)
+            i=0;
+        for(m=0; m<9; m++)
+        {
+            ad_data[m]=OSQPend(ADQ,0,&err);
+        }
+        n=0;
+        n=n|(u32)*ad_data[0];
+        n=n<<8;
+        n=n|(u32)*ad_data[1];
+        n=n<<8;
+        n=n|(u32)*ad_data[2];
+        wiight_display[7]=n%10;
+        n=n/10;
+        wiight_display[6]=n%10;
+        n=n/10;
+        wiight_display[5]=n%10;
+        n=n/10;
+        wiight_display[4]=n%10;
+        n=n/10;
+        wiight_display[3]=n%10;
+        n=n/10;
+        wiight_display[2]=n%10;
+        n=n/10;
+        wiight_display[1]=n%10;
+        n=n/10;
+        wiight_display[0]=n%10;
+
+        n=0;
+        n=n|(u32)*ad_data[3];
+        n=n<<8;
+        n=n|(u32)*ad_data[4];
+        n=n<<8;
+        n=n|(u32)*ad_data[5];
+
+        pice_display[5]=n%10;
+        n=n/10;
+        pice_display[4]=n%10;
+        n=n/10;
+        pice_display[3]=n%10;
+        n=n/10;
+        pice_display[2]=n%10;
+        n=n/10;
+        pice_display[1]=n%10;
+        n=n/10;
+        pice_display[0]=n%10;
+
+        n=0;
+        n=n|(u32)*ad_data[6];
+        n=n<<8;
+        n=n|(u32)*ad_data[7];
+        n=n<<8;
+        n=n|(u32)*ad_data[8];
+
+        total_display[5]=n%10;
+        n=n/10;
+        total_display[4]=n%10;
+        n=n/10;
+        total_display[3]=n%10;
+        n=n/10;
+        total_display[2]=n%10;
+        n=n/10;
+        total_display[1]=n%10;
+        n=n/10;
+        total_display[0]=n%10;
+        //*****************重量***********************************
+        LCD_ShowChar(448,60,'k',24,0);
+        LCD_ShowChar(460,60,'g',24,0);
+
+        LCD_ShowChar8(416,42,wiight_display[7],24,0);//小数点后两位
+        LCD_ShowChar8(384,42,wiight_display[6],24,0);//小数点后一位
+
+        LCD_ShowChar8(320,42,10,24,0);//小数点		 LCD_ShowChar8(352,42,10,24,0);//小数点
+
+        LCD_ShowChar8(352,42,wiight_display[5],24,0);//小数点前一位
+        LCD_ShowChar8(288,42,wiight_display[4],24,0);//小数点前两位
+
+
+        LCD_ShowChar8(256,42,wiight_display[3],24,0);//小数点前一位
+//        LCD_ShowChar8(224,42,wiight_display[2],24,0);//小数点前两位
+//        LCD_ShowChar8(192,42,wiight_display[1],24,0);//小数点前一位
+//        LCD_ShowChar8(160,42,wiight_display[0],24,0);//小数点前两位
+
+        ad_data[0]=0;
+        ad_data[1]=0;
+        ad_data[2]=0;
+        //******************单价**********************************
+
+        LCD_ShowChar8(448,142,pice_display[5],24,0);//小数点后两位
+        LCD_ShowChar8(416,142,pice_display[4],24,0);//小数点后一位
+
+        LCD_ShowChar8(384,142,10,24,0);//小数点
+
+        LCD_ShowChar8(352,142,pice_display[3],24,0);//小数点前一位
+        LCD_ShowChar8(320,142,pice_display[2],24,0);//小数点前两位
+        LCD_ShowChar8(288,142,pice_display[1],24,0);//小数点前一位
+        LCD_ShowChar8(256,142,pice_display[0],24,0);//小数点前两位
+
+        //********************总价*********************************
+        LCD_ShowChar8(448,242,total_display[5],24,0);//小数点后两位
+        LCD_ShowChar8(416,242,total_display[4],24,0);//小数点后一位
+
+        LCD_ShowChar8(384,242,10,24,0);//小数点
+
+        LCD_ShowChar8(352,242,total_display[3],24,0);//小数点前一位
+        LCD_ShowChar8(320,242,total_display[2],24,0);//小数点前两位
+        LCD_ShowChar8(288,242,total_display[1],24,0);//小数点前一位
+        LCD_ShowChar8(256,242,total_display[0],24,0);//小数点前两位
+        i=i++;
+//	delay_ms(5);
+    }
+
+}
+
+void usb_task(void *pdata)
+{
+    unsigned char err;
+    while (1) {
+        OSMboxPend(USBMBox,0,&err);
+        if(EP1_ReceivedCount < 1)
+            continue;
+        usb_int_function();  //处理usb事件
+        //uart1_send("have one usb message \r\n\0",0);
+
+    }
+}
+
+void main_task(void *pdata)
+{
+    u32 datatemp[SIZE];
+    u32 FLASH_SIZE;
+    u32 temp,temp1,temp2,temp3,aub_adjust1,sub_just2;
+    u32 totalprice,price_data;
+    u8 ad_avg_data[9];
+    u8 d[1];
+    u8 i,num;
+    u8 err_id;
+    int bz;
+    u8 err,key2,key1;
+    unsigned char  usb_data[64];
+    FLASH_SIZE=8*1024*1024;	//FLASH 大小为8M字节
+    pice_data[0]=0x00;
+    pice_data[1]=0;
+    pice_data[2]=0x00;
+    totalpice_data[0]=0;
+    totalpice_data[1]=0;
+    totalpice_data[2]=0;
+
+    // while(SPI_Flash_ReadID()!=W25Q64)
+    //  {
+    //     for(i=0; i<3; i++)
+    //     {
+    //         OSQPost(ADQ,&datatemp[i]);
+    //     }
+    //     datatemp[0]=datatemp[0]-1;
+    //     de lay_ms(500);
+    //  }
+    //  SPI_Flash_Write((u8*)TEXT_Buffer,FLASH_SIZE-100,SIZE);		//从倒数第100个地址处开始,写入SIZE长度的数据
+
+    Lcd_Initialize();
+    Lcd_ColorBox(0,0,320,480,Black);
+    delay_ms(5);
+    LCD_Fill_Pic(74,164,172,152,gImage_MM_T035);
+    LCD_ShowString(164,260,180,40,24,"adjusting.."); //显示开机状态提示
+//***********自动校准功能****************************************************************
+    delay_ms(1000);//等待天平状态稳定
+    LCD_ShowString(164,260,180,40,24,"adjusting...."); //显示开机状态提示
+    err_id=0;
+    bz=0;
+    for(i=0; i<9;)
+    {
+        if(AD_DATA[0]&0x80)
+        {
+            ad_avg_data[i]=AD_DATA[0]&0x7f;
+            ad_avg_data[i+1]=AD_DATA[1];
+            ad_avg_data[i+2]=AD_DATA[2];
+            AD_DATA[0]=AD_DATA[0]&0x7f;
+            i=i+3;
+            delay_ms(1000);
+            LCD_ShowString(164,260,180,40,24,"adjusting......"); //显示开机状态提示
+        }
+        bz=bz+1;
+        if(bz>397)
+        {
+            i=10;
+            err_id=0x01;
+        }
+        delay_ms(10);
+    }
+
+    if(err_id==0)
+    {
+        temp1=0;
+        temp1=temp1|(u32)ad_avg_data[0];
+        temp1=temp1<<8;
+        temp1=temp1|(u32)ad_avg_data[1];
+        temp1=temp1<<8;
+        temp1=temp1|(u32)ad_avg_data[2];
+
+        temp2=0;
+        temp2=temp2|(u32)ad_avg_data[3];
+        temp2=temp2<<8;
+        temp2=temp2|(u32)ad_avg_data[4];
+        temp2=temp2<<8;
+        temp2=temp2|(u32)ad_avg_data[5];
+
+        temp3=0;
+        temp3=temp3|(u32)ad_avg_data[6];
+        temp3=temp3<<8;
+        temp3=temp3|(u32)ad_avg_data[7];
+        temp3=temp3<<8;
+        temp3=temp3|(u32)ad_avg_data[8];
+        if(temp1<temp2)
+        {
+            temp=temp2;
+            temp2=temp1;
+            temp1=temp;
+        }
+        if(temp1<temp3)
+        {
+            temp=temp3;
+            temp3=temp1;
+            temp1=temp;
+        }
+        if((temp1-temp2<200)&&(temp1-temp3<200))
+        {
+            Zerotracking_data=(temp1+temp2+temp3)/3;
+        }
+        else
+            err_id=0x02;
+    }
+    while(err_id)
+    {
+
+        switch(err_id) {
+        case 0x01:
+            LCD_ShowString(164,260,200,40,24,"err_id: -001-!"); //显示开机状态提示
+            break;
+        case 0x02:
+            LCD_ShowString(164,260,200,40,24,"err_id: -002-!"); //显示开机状态提示
+            break;
+        default:
+            LCD_ShowString(164,260,200,40,24,"88888888!"); //显示开机状态提示
+            break;
+
+        }
+
+    }
+//***************************************************************************************
+    OSTaskCreate(lcd_task,(void *)0,(OS_STK*)&LCD_TASK_STK[LCD_TASK_STK_SIZE-1],LCD_TASK_PRIO);
+    LCD_ShowString(164,260,180,40,24,"adjusting..    "); //显示开机状态提示
+    delay_ms(1000);
+    LCD_ShowString(164,260,180,40,24,"adjusting....  "); //显示开机状态提示
+    delay_ms(1000);
+    LCD_ShowString(164,260,180,40,24,"adjusting......"); //显示开机状态提示
+    delay_ms(1000);
+    LCD_ShowString(164,260,180,40,24,"adjusting..    "); //显示开机状态提示
+
+    num=0;
+    while(1)
+    {
+        key2=(u32)OSMboxPend(key2Box,1,&err);
+        if((key2>0)&&(key2<37))//判断plu按键是否按下
+        {
+            if(num<10)
+            {
+                weight[num]=calculate_weight;
+                plu[num]=key2;
+                price[num]=price_data;
+            }
+            else
+            {
+                num=0;
+                for(i=0; i<10; i++)
+                {
+                    weight[i]=0;
+                    plu[i]=0;
+                    price[i]=0;
+                }
+
+                weight[num]=calculate_weight;
+                plu[num]=key2;
+                price[num]=price_data;
+            }
+
+
+
+            i=4+(num)*3 ;
+            usb_data[i]=weight[num];
+            usb_data[i+1]=plu[num];
+            usb_data[i+2]=price[num];
+            USB_SendData(ENDP1,usb_data,EP1_ReceivedCount);
+            num++;
+
+
+            totalprice=0;
+            //	  weight[0]=9;
+            //	   price[0]=1;
+            for(i=0; i<num; i++)
+            {
+                totalprice=totalprice+weight[i]*price[i];
+            }
+            totalprice=totalprice/1000;
+
+
+		            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+		LCD_ShowChar8(198,260,totalpice_data[2],24,0);//小数点后两位
+
+
+		            totalprice=totalprice/10;
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+        LCD_ShowChar8(166,260,totalpice_data[2],24,0);//小数点后一位
+
+        LCD_ShowChar8(134,260,10,24,0);//小数点
+
+		            totalprice=totalprice/10;
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;		
+        LCD_ShowChar8(102,260,totalpice_data[2],24,0);//小数点前一位
+
+		            totalprice=totalprice/10;
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+        LCD_ShowChar8(70,260,totalpice_data[2],24,0);//小数点前两位
+
+		            totalprice=totalprice/10;
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+        LCD_ShowChar8(38,260,totalpice_data[2],24,0);//小数点前一位
+
+				            totalprice=totalprice/10;
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+        LCD_ShowChar8(6,260,totalpice_data[2],24,0);//小数点前两位
+		   /*
+            LCD_ShowString(10,280,200,40,24,"totalprice:");
+            LCD_ShowString(10,250,200,40,24,"totalnum:");
+            if(i==10)
+            {   LCD_ShowChar(130,250,'1',24,0);
+                LCD_ShowChar(150,250,'0',24,0);
+            }
+            else
+            {
+                LCD_ShowChar(130,250,' ',24,0);
+                i=num+' '+16;
+                LCD_ShowChar(150,250,i,24,0);
+            }
+
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+            LCD_ShowChar(210,280,totalpice_data[2],24,0);
+
+            totalprice=totalprice/10;
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+            LCD_ShowChar(180,280,totalpice_data[2],24,0);
+
+            totalprice=totalprice/10;
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+            LCD_ShowChar(165,280,totalpice_data[2],24,0);
+
+            totalprice=totalprice/10;
+            totalpice_data[2]=totalprice%10;
+            totalpice_data[2]=totalpice_data[2]+' '+16;
+            LCD_ShowChar(150,280,totalpice_data[2],24,0);
+
+            LCD_ShowChar(195,280,'.',24,0);
+
+        }
+		 */
+
+        //  key1=OSMboxPost(key1Box,1,&err);//
+        // if((key1>=0)&&(key1<25))//判断plu按键是否按下
+        //   {
+        //	  }
+        // key2=key2+' ';
+        // LCD_ShowChar(60,60,key2,24,0);
+        // uart1_send_(usb_data,10);
+        for(i=0; i<3; i++)
+        {
+            if(i==0)
+            {
+                AD_DATA[0]=AD_DATA[0]&0x7f;
+                temp1=0;
+                temp1=temp1|(u32)AD_DATA[0];
+                temp1=temp1<<8;
+                temp1=temp1|(u32)AD_DATA[1];
+                temp1=temp1<<8;
+                temp1=temp1|(u32)AD_DATA[2];
+                if(temp1>Zerotracking_data)
+                    temp1=temp1-Zerotracking_data;
+                else
+                    temp1=0;
+                temp1=temp1*0.0079681274;
+                if(calculate_weight>temp1)//更新计算质量算法
+                {
+                    if((calculate_weight-temp1)>0X01)
+                        calculate_weight=temp1;
+                }
+                else
+                {
+                    if((temp1-calculate_weight)>0X01)
+                        calculate_weight=temp1;
+                }
+
+                temp3=calculate_weight;
+                AD_DATA[2]=(u8)calculate_weight;
+                calculate_weight=calculate_weight>>8;
+                AD_DATA[1]=(u8)calculate_weight;
+                calculate_weight=calculate_weight>>8;
+                AD_DATA[0]=(u8)calculate_weight;
+                AD_DATA[0]=AD_DATA[0]|0x80;
+                calculate_weight=temp3;
+            }
+            OSQPost(ADQ,&AD_DATA[i]);
+        }
+        AD_DATA[0]=AD_DATA[0]&0x7f;
+        for(i=3; i<6; i++)
+        {
+            //pice_data[2]=0xff;
+            OSQPost(ADQ,&pice_data[i-3]);
+            //	OSQPost(ADQ,&ad_avg_data[i-3]);
+        }
+
+        for(i=6; i<9; i++)
+        {
+            temp2=0;
+            temp2=temp2|(u32)pice_data[0];
+            temp2=temp2<<8;
+            temp2=temp2|(u32)pice_data[1];
+            temp2=temp2<<8;
+            temp2=temp2|(u32)pice_data[2];
+            price_data=temp2;
+            temp2=temp3*temp2/1000;
+
+
+            totalpice_data[2]=(u8)temp2;
+            temp2=temp2>>8;
+            totalpice_data[1]=(u8)temp2;
+            temp2=temp2>>8;
+            totalpice_data[0]=(u8)temp2;
+            OSQPost(ADQ,&totalpice_data[i-6]);
+        }
+        totalpice_data[2]++;
+
+
+
+//***********初始化logo显示**************************************************************
+//***************************************************************************************
+        delay_ms(200);
+    };
+}
+void heartbeat_led_task(void *pdata)
+{
+    //void *lmsg;
+    //uint8_t *msg;
+//	INT8U err;
+    //unsigned int cnt = 0;
+    //char msg[64];
+    while(1)
+    {
+        /*
+        HEARTBEAT_LED = LED_ON;
+        delay_ms(80);
+        HEARTBEAT_LED = LED_OFF;
+        delay_ms(920);
+        */
+//	   lmsg = OSQPend(MessageQ,0,&err);
+//	   if (err == OS_ERR_NONE) {
+//	     //msg = (uint8_t *)lmsg;
+//
+//		 //USB_SendData(ENDP1,lmsg,64);
+//	   }
+        delay_ms(100);
+
+        //delay_ms(10000);
+    };
+}
+void sendmessage(u8 Res) {
+smstart:
+    if(MessageType == 0) {	//empty
+        if(Res==0x57||Res==0x53||Res==0x50||Res==0x77||Res==0x59) {
+            MessageType = 0x57;
+            RxBuffer1[RxCounter1] = Res;
+            RxCounter1=1;
+        }
+    }
+    else if(MessageType == 0x57) {	//STABLE
+        if(RxCounter1<5) {			//RxCounter1>0&&
+            RxBuffer1[RxCounter1++] = Res;
+            if(RxCounter1==2) {
+                HEARTBEAT_LED = LED_ON;
+                if(Res!=0xff) {
+                    if(RxBuffer1[0]==0x57||RxBuffer1[0]==0x53||Res==0x59)
+                        PressN=Res;
+                }
+            } else if(RxCounter1==5) {
+                //MessageType=0;
+                MessageType=0x01;
+                if(ReCheck) {
+                    MessageType=0;
+                    RxCounter1=0;
+                    ReCheck=0;
+                } else {
+                    if(PressN!=0xff) {
+                        //HEARTBEAT_LED = LED_ON;
+                        USART_SendData(USART1,0x12);
+                    } else {
+                        //HEARTBEAT_LED = LED_ON;
+                        USB_SendData(ENDP1,RxBuffer1,5);
+                        HEARTBEAT_LED = LED_OFF;
+                    }
+                }
+
+//				RxBuffer1[8]=0xf1;
+//				RxBuffer1[40]=0xf1;
+                //RxCounter1=0;
+                //OSQPost(USBSentMsg
+                //USB_SendData(ENDP1,RxBuffer1,64);
+
+            }
+        }
+    }
+    else if (MessageType==0x01) {
+
+        if(RxCounter1==5) {
+            if(Res==0x01) {
+                RxBuffer1[5] = 0x01;
+                MessageType=0x02;
+                RxCounter1=6;
+            } else {
+                //if(Res==0x57||Res==0x53){
+                MessageType=0;
+                RxCounter1=0;
+                ReCheck=1;
+                goto smstart;
+                //}
+            }
+        } else {
+
+        }
+    }
+    else if (MessageType==0x02) {
+        RxBuffer1[RxCounter1++] = Res;
+        if(RxCounter1==42) {
+            MessageType=0;
+            RxCounter1=0;
+            if((PressN!=0xff)&&(RxBuffer1[1]==0xff)) {
+                RxBuffer1[1]=PressN;
+                PressN=0xff;
+            }
+            USB_SendData(ENDP1,RxBuffer1,43);
+            HEARTBEAT_LED = LED_OFF;
+            //USB_SendData(ENDP1,RxBuffer1,43);
+            //OSQPost(MessageQ,RxBuffer1);
+        }
+    }
+
+
+
+//	if(UartLengthCount==1){
+//		if(MessageType == 0x01 && Res == 0x30){
+//		 	USB_SendData(ENDP1,"I LOVE Y",8);
+//		}
+//	}else if(UartLengthCount==0&&Res==0x57){
+//		UartLengthCount=6;
+//    }
+
+    //USB_SendData(ENDP1,Res,1);
+}
+void rs232_log_task(void *pdata)
+{
+    void *lmsg;
+    char *msg;
+    INT8U err;
+
+    pdata = pdata;
+    while (1) {
+        lmsg = OSQPend(RS232LogQ,0,&err);
+        if (err == OS_ERR_NONE) {
+            msg = lmsg;
+            uart1_send_(msg,strlen(msg));
+        }
+        delay_ms(100);
+    }
+}
+
+
+
+//开始任务
+void start_task(void *pdata)
+{
+    OS_CPU_SR cpu_sr=0;
+    pdata = pdata;
+    OSStatInit();					//初始化统计任务.这里会延时1秒钟左右
+    OS_ENTER_CRITICAL();			//进入临界区(无法被中断打断)
+    //OSTaskCreate(heartbeat_led_task,(void *)0,(OS_STK*)&HEARTBEAT_LED_TASK_STK[HEARTBEAT_LED_STK_SIZE-1],HEARTBEAT_LED_TASK_PRIO);	//心跳指示灯 任务
+    OSTaskCreate(usb_task,(void *)0,(OS_STK*)&USB_TASK_STK[USB_STK_SIZE-1],USB_TASK_PRIO); 	// usb 任务
+    OSTaskCreate(Beep_task,(void *)0,(OS_STK*)&BEEP_TASK_TASK_STK[BEEP_TASK_TASK_STK_SIZE-1],BEEP_TASK_TASK_PRIO);
+    OSTaskCreate(AD_task,(void *)0,(OS_STK*)&AD_TASK_STK[AD_TASK_STK_SIZE-1],AD_TASK_PRIO);
+    OSTaskCreate(Key1_scan_task,(void *)0,(OS_STK*)&KEY1_SCAN_TASK_STK[KEY1_SCAN_TASK_STK_SIZE-1],KEY1_SCAN_TASK_PRIO);
+    OSTaskCreate(Key2_scan_task,(void *)0,(OS_STK*)&KEY2_SCAN_TASK_STK[KEY2_SCAN_TASK_STK_SIZE-1],KEY2_SCAN_TASK_PRIO);
+    //OSTaskCreate(lcd_task,(void *)0,(OS_STK*)&LCD_TASK_STK[LCD_TASK_STK_SIZE-1],LCD_TASK_PRIO);
+    OSTaskCreate(main_task,(void *)0,(OS_STK*)&MAIN_TASK_STK[MAIN_TASK_STK_SIZE-1],MAIN_TASK_PRIO);
+    OSTaskCreate(LED_task,(void *)0,(OS_STK*)&LED_TASK_STK[LED_STK_SIZE-1],LED_TASK_PRIO);
+    //OSTaskCreate(rs232_log_task,(void *)0,(OS_STK*)&RS232_LOG_TASK_STK[RS232_LOG_STK_SIZE-1],RS232_LOG_TASK_PRIO);					// 串口日志 任务
+    OSTaskSuspend(START_TASK_PRIO);	//挂起起始任务.
+    OS_EXIT_CRITICAL();				//退出临界区(可以被中断打断)
+}
+
+
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  报告在检查参数发生错误时的源文件名和错误行数
+  * @param  file 源文件名
+  * @param  line 错误所在行数
+  * @retval None
+  */
+void assert_failed(uint8_t* file, uint32_t line)
+{
+    /* 用户可以增加自己的代码用于报告错误的文件名和所在行数,
+       例如：printf("错误参数值: 文件名 %s 在 %d行\r\n", file, line) */
+
+    /* 无限循环 */
+    while (1)
+    {
+    }
+}
+#endif
+
+/*********************************END OF FILE**********************************/
