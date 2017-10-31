@@ -188,9 +188,9 @@ void AUDIO_init(void)
 //-*************************main**************************************************************
  int main(void)
  {	
-	u8 stat = 10;
+//	u8 stat = 10;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable,ENABLE);
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置中断优先级分组为组2：2位抢占优先级，2位响应优先级
 	delay_init();	    //延时函数初始化	  
 	uart_init(115200);
@@ -219,7 +219,7 @@ void AUDIO_init(void)
 	
 	ADc_Init();
 	plu_init();
-	stat = W25QXX_ReadSR();
+//	stat = W25QXX_ReadSR();
 //	printf("stat=%d\n",stat);
 	delay_ms(100);
 	
@@ -283,7 +283,7 @@ void contrl_task(void *pdata)
 
 	u8 weightflag = 0;
 	u8 more = 0;
-	unsigned int i = 0, j = 0,l = 0;
+	unsigned int i = 0,l = 0;
 	unsigned char m = 0;
 	unsigned char fat = 0;
 	u8 err;
@@ -539,34 +539,42 @@ void contrl_task(void *pdata)
 					
 			LCD_ShowChar8(150,5,125,12,0);    //电池显示
 			LCD_ShowChar8(50,5,126,12,0);     //'kg'显示	
-			l++;
-			if(pointflag == 0)
-			{			
-				if(l <= 3)
-				{
-					LCD_Fill(377,175,392,179,White);
-					LCD_Fill(401,175,416,179,Black);
-				}
-				else
-				{
-					LCD_Fill(377,175,392,179,Black);
-					LCD_Fill(401,175,416,179,Black);
-				}
-			}
-			if(pointflag == 1)
+			if(priceFlag == 0)
 			{
-				if(l<=3)
-				{
-					LCD_Fill(377,175,392,179,Black);
-					LCD_Fill(401,175,416,179,White);
+				l++;
+				if(pointflag == 0)
+				{			
+					if(l <= 3)
+					{
+						LCD_Fill(377,175,392,179,White);
+						LCD_Fill(401,175,416,179,Black);
+					}
+					else
+					{
+						LCD_Fill(377,175,392,179,Black);
+						LCD_Fill(401,175,416,179,Black);
+					}
 				}
-				else
+				if(pointflag == 1)
 				{
-					LCD_Fill(377,175,392,179,Black);
-					LCD_Fill(401,175,416,179,Black);
+					if(l<=3)
+					{
+						LCD_Fill(377,175,392,179,Black);
+						LCD_Fill(401,175,416,179,White);
+					}
+					else
+					{
+						LCD_Fill(377,175,392,179,Black);
+						LCD_Fill(401,175,416,179,Black);
+					}
 				}
+				if(l==6)l=0;
 			}
-			if(l==6)l=0;
+			else
+			{
+				LCD_Fill(377,175,392,179,Black);
+				LCD_Fill(401,175,416,179,Black);
+			}
 		}
 	}
 }
@@ -610,7 +618,7 @@ void ad_task(void *pdata)
 		weight_new = ((int)((float)weight_new * K))/100 - g_peel;                                //去皮操作 
 //		printf("source:%d\n",weight_new);		//此处增加显示稳定标志
 		
-		if((weight_new <= 3)&&(weight_new >= -3))
+		if((weight_new <= 4)&&(weight_new >= -4))
 		{
 			weight_new = 0;
 		}
@@ -914,7 +922,11 @@ void key2_handle(u8 key_num)
 						beep_two = 1;
 						return;
 					}			
-		
+		if(g_weight < 0)
+		{
+				beep_two = 1;
+				return;
+		}
 		
 		if(goods_num < 9)
 		{
