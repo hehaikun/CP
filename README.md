@@ -1,2 +1,1 @@
-# 最新的stm32 秤体代码，
-包括功能的改进
+## this is my C program
